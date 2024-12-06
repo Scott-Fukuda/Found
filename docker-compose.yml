@@ -1,0 +1,9 @@
+version: "3"
+
+services: 
+  demo:
+    image: glm86/found
+    env_file: .env
+    ports:
+    - "80:8000"
+    
