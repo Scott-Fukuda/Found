@@ -36,38 +36,6 @@ def welcome():
 
 ############# SPECIALIZED ROUTES #############
 
-# @app.route("/api/lost-request/<int:user_id>/", methods=["POST"])
-# def lost_request(user_id):
-#     """
-#     Creates a lost request and returns all of items that match 
-#     the attributes of the post body provided
-#     """
-#     user = User.query.filter_by(id=user_id).first()
-#     if user is None:
-#         return failure_response('User not found!')
-#     # load body and add new request to database
-#     body = json.loads(request.data)
-#     category = body.get("category")
-#     color = body.get("color")
-#     new_request = Request(
-#             item_name = body.get("item_name"),
-#             category = category,
-#             color = color,
-#             description = body.get("description"),
-#             location_lost = body.get("location_lost"),
-#             fulfilled = False,
-#             user_id = user_id
-#     )
-#     db.session.add(new_request)
-#     db.session.commit()
-
-#     # filter by items that match category
-#     items = [i.serialize() for i in Items.query.filter_by(category=category)]
-
-#     # within a list of items, using for loops to filter by those that contain at least one of the colors
-#     sorted_items = sort_by_color(items, color)
-#     return success_response(sorted_items, 201)
-
 @app.route("/api/lost-request/<int:user_id>/", methods=["POST"])
 def lost_request(user_id):
     """
