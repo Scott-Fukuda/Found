@@ -35,11 +35,45 @@ def welcome():
     return 'Hi'
 
 ############# SPECIALIZED ROUTES #############
+
+# @app.route("/api/lost-request/<int:user_id>/", methods=["POST"])
+# def lost_request(user_id):
+#     """
+#     Creates a lost request and returns all of items that match 
+#     the attributes of the post body provided
+#     """
+#     user = User.query.filter_by(id=user_id).first()
+#     if user is None:
+#         return failure_response('User not found!')
+#     # load body and add new request to database
+#     body = json.loads(request.data)
+#     category = body.get("category")
+#     color = body.get("color")
+#     new_request = Request(
+#             item_name = body.get("item_name"),
+#             category = category,
+#             color = color,
+#             description = body.get("description"),
+#             location_lost = body.get("location_lost"),
+#             fulfilled = False,
+#             user_id = user_id
+#     )
+#     db.session.add(new_request)
+#     db.session.commit()
+
+#     # filter by items that match category
+#     items = [i.serialize() for i in Items.query.filter_by(category=category)]
+
+#     # within a list of items, using for loops to filter by those that contain at least one of the colors
+#     sorted_items = sort_by_color(items, color)
+#     return success_response(sorted_items, 201)
+
 @app.route("/api/lost-request/<int:user_id>/", methods=["POST"])
 def lost_request(user_id):
     """
     Creates a lost request and returns all of items that match 
     the attributes of the post body provided
+    Request has to match at least 2 attributes
     """
     user = User.query.filter_by(id=user_id).first()
     if user is None:
@@ -60,12 +94,26 @@ def lost_request(user_id):
     db.session.add(new_request)
     db.session.commit()
 
-    # filter by items that match category
-    items = [i.serialize() for i in Items.query.filter_by(category=category)]
+    matched_items = []
+    ocolor_list = listify(color)
+    items = Items.query.all()
+    for item in items:
+        matched = 0
+        if item.category == category:
+            matched += 1 
+        icolor_list = listify(item.color)
+        for icolor in icolor_list:
+            for ocolor in ocolor_list:
+                if icolor == ocolor:
+                    matched += 1 
+        if matched >= 2:
+            matched_items.append(item)
+    
+    ser_items = [i.serialize() for i in matched_items]
+    return success_response(ser_items)
+    
 
-    # within a list of items, using for loops to filter by those that contain at least one of the colors
-    sorted_items = sort_by_color(items, color)
-    return success_response(sorted_items, 201)
+
 
 def sort_by_color(lst, clrs):
     """
@@ -94,7 +142,7 @@ def listify(clr):
     Returns a list version of a color string
 
     Precondition: clrs is a string of a list of colors in 
-    the following format '["color1", "color2", etc.]'
+    the following format '["color1", "color2", etc.]' or "['color1', 'color2', etc.]"
     """
     list = []
     if clr =='[]':
@@ -119,6 +167,7 @@ def listify(clr):
             if i == -1:
                 break
     return list
+        
         
 
 
