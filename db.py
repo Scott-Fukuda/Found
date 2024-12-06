@@ -12,6 +12,9 @@ item_user = db.Table(
 )
 
 class User(db.Model):
+    """
+    User model
+    """
     __tablename__ = "user"
     id = db.Column(db.Integer, primary_key=True, auto_increment=True)
     profile_image = db.Column(db.String, nullable=True)
@@ -51,7 +54,10 @@ class User(db.Model):
         }
 
 
-class Request(db.Model):    
+class Request(db.Model):  
+    """
+    Request model
+    """
     __tablename__ = "request"    
     id = db.Column(db.Integer, primary_key=True, autoincrement=True) 
     item_name = db.Column(db.String, nullable=False)
