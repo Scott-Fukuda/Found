@@ -245,16 +245,7 @@ def saved_items(user_id):
     item = Items.query.filter_by(id = item_id).first()
     if user is None or item is None:
         return failure_response("Item/User not found")
-    added_item = Items(item_name = item.item_name,
-                    description = item.description,
-                    location_found = item.location_found,
-                    drop_location = item.drop_location,
-                    color = item.color,
-                    category = item.category,
-                    image = item.image,
-                    fulfilled = item.fulfilled,
-                    user_id = item.user_id)
-    user.added_items.append(added_item)
+    user.added_items.append(item)
     db.session.commit() 
     return success_response(user.serialize())
 
@@ -268,6 +259,23 @@ def get_all_saved_items(user_id):
         return failure_response("User not found") 
     saved = [s.serialize() for s in user.added_items]
     return success_response(saved)
+
+@app.route("/api/users/<int:user_id>/saved/<int:item_id>", methods = ["DELETE"])
+def delete_saved_item(user_id,item_id):
+    """
+    Deletes a saved item from the added_items list based on ID
+    """
+    user = User.query.filter_by(id=user_id).first()
+    item = Items.query.filter_by(id=item_id).first()
+    if user is None:
+        return failure_response('User not found!')
+    if item is None:
+        return failure_response('Item not found!')
+    if item not in user.added_items:
+        return failure_response('Item not saved!')
+    user.added_items.remove(item)
+    db.session.commit()
+    return success_response(item.serialize())
 
 ############ ITEMS ROUTES #############
 
