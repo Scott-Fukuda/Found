@@ -29,12 +29,25 @@ def success_response(data, code=200):
 def failure_response(message, code=404):
     return json.dumps({"success": False, "error": message}), code
 
-
+############# SPECIALIZED ROUTES #############
 @app.route("/")
 def welcome():
     return 'Hi'
 
-############# SPECIALIZED ROUTES #############
+
+@app.route("/api/user-login/<string:an_email>/")
+def user_login(an_email):
+    """
+    Returns a serialized User based on the email provided. This is acceptable, as each 
+    email can only be assigned to one User.
+    """
+    print("soft",repr(an_email))
+    user = User.query.filter_by(email=an_email).first()
+    print('sof', user)
+    if user is None:
+        return failure_response('User not found!')
+    return success_response(user.serialize())
+
 
 @app.route("/api/lost-request/<int:user_id>/", methods=["POST"])
 def lost_request(user_id):
@@ -79,8 +92,6 @@ def lost_request(user_id):
     
     ser_items = [i.serialize() for i in matched_items]
     return success_response(ser_items)
-    
-
 
 
 def sort_by_color(lst, clrs):
@@ -103,7 +114,6 @@ def sort_by_color(lst, clrs):
                 break # if one color matches, it moves onto the next item in the list
     return new_items_list
          
-
 
 def listify(clr):
     """
@@ -136,8 +146,6 @@ def listify(clr):
                 break
     return list
         
-        
-
 
 ############# USER ROUTES #############
 
